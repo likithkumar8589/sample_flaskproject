@@ -24,7 +24,7 @@ VOICE_DIR = "static/voice"
 os.makedirs(VOICE_DIR, exist_ok=True)
 
 # Voice output (TTS)
-engine = pyttsx3.init()
+#engine = pyttsx3.init()
 
 # Voice input (STT)
 whisper_model = whisper.load_model("base")
