@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>MedMate AI</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+  <div class="container">
+    <header class="header">
+      🩺 CareCompanion - Welcome, {{ username }} | <a href="/logout" style="color:white;">Logout</a>
+    </header>
+    
+    <div id="chatbox" class="chatbox">
+      <div class="message bot">Hi! I'm CareCompanion. How can I help you today?</div>
+    </div>
+
+    <div class="input-area">
+      <input type="text" id="userInput" placeholder="Type your symptoms or question..." autocomplete="off" />
+      <button onclick="sendMessage()">➤</button>
+      <button id="voiceInputBtn" title="Voice Input">🎙️</button>
+      <button id="stopBtn" title="Stop Thinking" onclick="stopResponse()">⛔</button>
+    </div>
+
+    <audio id="voicePlayer" hidden></audio>
+  </div>
+
+  <script>
+    const chatbox = document.getElementById("chatbox");
+    const userInput = document.getElementById("userInput");
+    const voiceBtn = document.getElementById("voiceInputBtn");
+    const stopBtn = document.getElementById("stopBtn");
+    const voicePlayer = document.getElementById("voicePlayer");
+
+    let controller = null;
+
+    function addMessage(message, sender) {
+      const msgDiv = document.createElement("div");
+      msgDiv.classList.add("message", sender);
+      msgDiv.innerText = message;
+      chatbox.appendChild(msgDiv);
+      chatbox.scrollTop = chatbox.scrollHeight;
+    }
+
+    async function sendMessage() {
+      const message = userInput.value.trim();
+      if (!message) return;
+
+      addMessage(message, "user");
+      const thinkingMsg = document.createElement("div");
+      thinkingMsg.classList.add("message", "bot");
+      thinkingMsg.innerText = "Thinking...";
+      chatbox.appendChild(thinkingMsg);
+      chatbox.scrollTop = chatbox.scrollHeight;
+
+      userInput.value = "";
+
+      controller = new AbortController();
+
+      try {
+        const res = await fetch("/get", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ message }),
+          signal: controller.signal
+        });
+
+        const data = await res.json();
+        thinkingMsg.remove();
+        addMessage(data.response, "bot");
+
+        // Play voice
+        if (data.voice_url) {
+          voicePlayer.src = data.voice_url;
+          voicePlayer.play();
+        }
+      } catch (err) {
+        thinkingMsg.remove();
+        if (err.name === "AbortError") {
+          addMessage("Response stopped.", "bot");
+        } else {
+          console.error(err);
+          addMessage("Something went wrong. Please try again.", "bot");
+        }
+      }
+    }
+
+    function stopResponse() {
+      if (controller) {
+        controller.abort();
+      }
+    }
+
+    async function startVoiceInput() {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        const mediaRecorder = new MediaRecorder(stream);
+        const audioChunks = [];
+
+        mediaRecorder.ondataavailable = (event) => {
+          audioChunks.push(event.data);
+        };
+
+        mediaRecorder.onstop = async () => {
+          const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+          const formData = new FormData();
+          formData.append("audio", audioBlob);
+
+          const res = await fetch("/voice", {
+            method: "POST",
+            body: formData
+          });
+
+          const data = await res.json();
+          userInput.value = data.text;
+        };
+
+        mediaRecorder.start();
+        setTimeout(() => mediaRecorder.stop(), 4000); // record 4 seconds
+      } catch (err) {
+        console.error("Voice input failed", err);
+        alert("Could not access microphone.");
+      }
+    }
+
+    userInput.addEventListener("keypress", function (e) {
+      if (e.key === "Enter") {
+        sendMessage();
+      }
+    });
+
+    voiceBtn.addEventListener("click", startVoiceInput);
+  </script>
+</body>
+</html>

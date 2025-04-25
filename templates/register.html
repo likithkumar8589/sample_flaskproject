@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Register - CareCompanion</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        .auth-container {
+            max-width: 400px;
+            margin: 100px auto;
+            padding: 2rem;
+            background-color: #1f1f1f;
+            border-radius: 12px;
+            box-shadow: 0 0 10px rgba(0, 255, 213, 0.3);
+            text-align: center;
+        }
+        .auth-container h2 {
+            margin-bottom: 1.5rem;
+            color: #00ffd5;
+        }
+        .auth-container input {
+            width: 100%;
+            padding: 0.75rem;
+            margin: 0.5rem 0;
+            border-radius: 8px;
+            border: none;
+            outline: none;
+            font-size: 1rem;
+        }
+        .auth-container button {
+            width: 100%;
+            padding: 0.75rem;
+            background-color: #00ffd5;
+            color: #000;
+            font-weight: bold;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 1rem;
+        }
+        .auth-container a {
+            display: block;
+            margin-top: 1rem;
+            color: #ccc;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="auth-container">
+        <h2>Create a CareCompanion Account</h2>
+        <form method="POST" action="/register">
+            <input type="text" name="username" placeholder="Choose a username" required>
+            <input type="password" name="password" placeholder="Choose a password" required>
+            <button type="submit">Register</button>
+        </form>
+        <a href="/login">Already have an account? Login</a>
+    </div>
+</body>
+</html>
