@@ -9,3 +9,4 @@ pydub
 gTTS
 gunicorn
 ollama
+pyttsx3
