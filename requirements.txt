@@ -10,3 +10,4 @@ gTTS
 gunicorn
 ollama
 pyttsx3
+whisper
