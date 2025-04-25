@@ -27,7 +27,7 @@ os.makedirs(VOICE_DIR, exist_ok=True)
 #engine = pyttsx3.init()
 
 # Voice input (STT)
-whisper_model = whisper.load_model("base")
+#whisper_model = whisper.load_model("base")
 
 # ---------- ROUTES ----------
 
