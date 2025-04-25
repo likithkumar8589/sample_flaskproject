@@ -8,3 +8,4 @@ SpeechRecognition
 pydub
 gTTS
 gunicorn
+ollama
