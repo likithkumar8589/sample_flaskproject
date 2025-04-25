@@ -7,6 +7,7 @@ import pyttsx3
 import whisper
 from pydub import AudioSegment
 from flask_cors import CORS
+from gtts import gTTS
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'  # Needed for session
